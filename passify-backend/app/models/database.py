@@ -1,0 +1,171 @@
+"""
+models/database.py
+------------------
+Low-level MySQL data-access layer.
+
+All functions accept an explicit `connection` object so the service layer
+controls connection lifetime and there are no hidden global side-effects.
+"""
+
+from __future__ import annotations
+
+import logging
+from typing import List, Optional, Tuple
+
+import mysql.connector
+from mysql.connector import Error as MySQLError
+from flask import current_app
+
+logger = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# Connection factory
+# ---------------------------------------------------------------------------
+
+def get_connection(mysql_user: str, mysql_password: str) -> mysql.connector.MySQLConnection:
+    """
+    Open and return a MySQL connection for the given credentials.
+
+    Raises:
+        ConnectionError: if the connection cannot be established.
+    """
+    try:
+        conn = mysql.connector.connect(
+            host=current_app.config["MYSQL_HOST"],
+            port=current_app.config["MYSQL_PORT"],
+            user=mysql_user,
+            password=mysql_password,
+        )
+        logger.info("MySQL connection established for user '%s'", mysql_user)
+        return conn
+    except MySQLError as exc:
+        logger.error("MySQL connection failed: %s", exc)
+        raise ConnectionError(f"Cannot connect to database: {exc}") from exc
+
+
+# ---------------------------------------------------------------------------
+# Schema bootstrap
+# ---------------------------------------------------------------------------
+
+def ensure_schema(conn: mysql.connector.MySQLConnection, login_user: str) -> None:
+    """
+    Create the per-user database and table if they do not already exist.
+
+    Naming mirrors the original project:
+        database : db_password_<login_user>
+        table    : tb_<login_user>
+    """
+    db_name = _db_name(login_user)
+    table_name = _table_name(login_user)
+
+    with conn.cursor() as cur:
+        cur.execute(f"CREATE DATABASE IF NOT EXISTS `{db_name}`")
+        cur.execute(
+            f"""
+            CREATE TABLE IF NOT EXISTS `{db_name}`.`{table_name}` (
+                id       INT          NOT NULL AUTO_INCREMENT,
+                name     VARCHAR(255) NOT NULL,
+                tag      VARCHAR(255),
+                password BLOB         NOT NULL,
+                salt     BLOB         NOT NULL,
+                PRIMARY KEY (id)
+            )
+            """
+        )
+    conn.commit()
+    logger.info("Schema ensured for user '%s'", login_user)
+
+
+# ---------------------------------------------------------------------------
+# CRUD helpers
+# ---------------------------------------------------------------------------
+
+def list_entries(
+    conn: mysql.connector.MySQLConnection,
+    login_user: str,
+) -> List[dict]:
+    """Return all (id, name, tag) rows — never the encrypted password."""
+    sql = f"SELECT id, name, tag FROM `{_db_name(login_user)}`.`{_table_name(login_user)}`"
+    with conn.cursor(dictionary=True) as cur:
+        cur.execute(sql)
+        return cur.fetchall()
+
+
+def fetch_entry_raw(
+    conn: mysql.connector.MySQLConnection,
+    login_user: str,
+    entry_id: int,
+) -> Optional[dict]:
+    """
+    Return the full raw row (id, name, tag, password BLOB, salt BLOB)
+    for a given id, or None if it does not exist.
+    """
+    sql = (
+        f"SELECT id, name, tag, password, salt "
+        f"FROM `{_db_name(login_user)}`.`{_table_name(login_user)}` "
+        f"WHERE id = %s"
+    )
+    with conn.cursor(dictionary=True) as cur:
+        cur.execute(sql, (entry_id,))
+        return cur.fetchone()
+
+
+def insert_entry(
+    conn: mysql.connector.MySQLConnection,
+    login_user: str,
+    name: str,
+    tag: str,
+    encrypted_password: bytes,
+    salt: bytes,
+) -> int:
+    """
+    Insert a new password entry and return the newly created row id.
+    """
+    sql = (
+        f"INSERT INTO `{_db_name(login_user)}`.`{_table_name(login_user)}` "
+        f"(name, tag, password, salt) VALUES (%s, %s, %s, %s)"
+    )
+    with conn.cursor() as cur:
+        cur.execute(sql, (name, tag, encrypted_password, salt))
+        conn.commit()
+        new_id = cur.lastrowid
+    logger.info("Inserted entry id=%s for user '%s'", new_id, login_user)
+    return new_id
+
+
+def delete_entry(
+    conn: mysql.connector.MySQLConnection,
+    login_user: str,
+    entry_id: int,
+) -> int:
+    """
+    Delete the row with the given id.
+
+    Returns:
+        Number of rows deleted (0 if the id did not exist).
+    """
+    sql = (
+        f"DELETE FROM `{_db_name(login_user)}`.`{_table_name(login_user)}` "
+        f"WHERE id = %s"
+    )
+    with conn.cursor() as cur:
+        cur.execute(sql, (entry_id,))
+        conn.commit()
+        affected = cur.rowcount
+    logger.info(
+        "Deleted %d row(s) with id=%s for user '%s'", affected, entry_id, login_user
+    )
+    return affected
+
+
+# ---------------------------------------------------------------------------
+# Private helpers
+# ---------------------------------------------------------------------------
+
+def _db_name(login_user: str) -> str:
+    return f"db_password_{login_user}"
+
+
+def _table_name(login_user: str) -> str:
+    return f"tb_{login_user}"

@@ -2,7 +2,7 @@
 // Passify API Client — configure BASE_URL to match your Flask server
 // =============================================================
 
-export const API_BASE = 'http://localhots:8123/api';
+export const API_BASE = 'http://localhots:6000/api';
 
 const authHeaders = (token, extra = {}) => ({
   'Content-Type': 'application/json',
