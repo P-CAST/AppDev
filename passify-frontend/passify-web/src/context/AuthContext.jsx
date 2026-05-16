@@ -42,8 +42,8 @@ export function AuthProvider({ children }) {
   // 3. Provide all credentials to the rest of the app 
   return (
     <AuthContext.Provider value={{ 
-      mysqlUser, 
-      mysqlPassword, 
+      username: mysqlUser,        // Map mysqlUser to username
+      password: mysqlPassword,    // Map mysqlPassword to password
       masterPassword, 
       login, 
       register, 

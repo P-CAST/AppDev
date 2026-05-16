@@ -158,11 +158,23 @@ export default function DashboardPage() {
 
   const loadPasswords = useCallback(async () => {
     setLoading(true);
+    setError(''); // Clear past errors on refresh
     try {
-      const data = await fetchPasswords(credentials);
-      setPasswords(data);
+      const result = await fetchPasswords(credentials);
+      
+      // SAFE UNPACKING:
+      // If the backend returns a wrapped envelope {"data": [...]}, extract it.
+      // If it's already a raw array, use it directly. Otherwise, fall back to [].
+      if (result && Array.isArray(result)) {
+        setPasswords(result);
+      } else if (result && result.data && Array.isArray(result.data)) {
+        setPasswords(result.data);
+      } else {
+        setPasswords([]);
+      }
     } catch (e) {
-      setError(e.message);
+      setError(e.message || 'Failed to fetch vault items.');
+      setPasswords([]); // Gracefully fall back to an empty list so the UI doesn't crash
     } finally {
       setLoading(false);
     }

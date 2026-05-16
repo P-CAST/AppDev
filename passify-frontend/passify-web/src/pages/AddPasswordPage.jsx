@@ -58,13 +58,14 @@ function generatePassword(length = 16) {
 
 // ── Main Component ───────────────────────────────────────────────
 export default function AddPasswordPage() {
-  const { token, masterPassword } = useAuth();
+  // FIX: Destructure the database credentials instead of the old 'token'
+  const { username, password, masterPassword } = useAuth();
   const navigate = useNavigate();
-
-  const [form, setForm]     = useState({ name: '', tag: '', password: '' });
-  const [show, setShow]     = useState(false);
+  
+  const [form, setForm] = useState({ name: '', tag: '', password: '' });
+  const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError]   = useState('');
+  const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
   const set = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }));
@@ -79,13 +80,19 @@ export default function AddPasswordPage() {
     e.preventDefault();
     setError('');
     setSuccess('');
+    
     if (!form.name || !form.password) {
       setError('Name and password are required.');
       return;
     }
+    
     setLoading(true);
+    
     try {
-      await createPassword({ ...form, master_password: masterPassword }, token);
+      // FIX: Bundle database credentials and pass them as the second argument
+      const credentials = { username, password, masterPassword };
+      await createPassword(form, credentials);
+      
       setSuccess('Password saved successfully!');
       setTimeout(() => navigate('/dashboard'), 1200);
     } catch (err) {
@@ -97,90 +104,45 @@ export default function AddPasswordPage() {
 
   return (
     <div className="page" style={{ alignItems: 'stretch', maxWidth: 520, margin: '0 auto' }}>
-      {/* Back */}
-      <button className="btn btn-ghost" style={{ alignSelf: 'flex-start', marginBottom: 24, padding: '7px 14px' }}
-        onClick={() => navigate('/dashboard')}>
-        <ArrowLeftIcon /> Back to Vault
+      <button className="btn btn-ghost" style={{ alignSelf: 'flex-start', marginBottom: 24, padding: '7px 14px' }} onClick={() => navigate('/dashboard')}>
+        Back to Vault
       </button>
-
-      <h1 style={{ fontFamily: 'var(--font-head)', fontSize: 26, fontWeight: 800, marginBottom: 6 }}>
-        Add New Password
-      </h1>
-      <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 28 }}>
-        Your password will be encrypted before being stored.
-      </p>
-
-      <div className="card fade-up">
-        {error   && <div className="msg-error"   style={{ marginBottom: 16 }}>{error}</div>}
+      
+      <div className="card">
+        <h2 style={{ fontFamily: 'var(--font-head)', fontWeight: 800, fontSize: 22, marginBottom: 24 }}>Add New Password</h2>
+        
+        {error && <div className="msg-error" style={{ marginBottom: 16 }}>{error}</div>}
         {success && <div className="msg-success" style={{ marginBottom: 16 }}>{success}</div>}
-
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-          {/* Name */}
+        
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           <div className="input-group">
-            <label className="input-label">Name <span style={{ color: 'var(--red)' }}>*</span></label>
-            <input className="input" type="text" placeholder="e.g. Gmail, GitHub…"
-              value={form.name} onChange={set('name')} />
+            <label className="input-label">Service Name</label>
+            <input className="input" placeholder="e.g. Google, GitHub" value={form.name} onChange={set('name')} />
           </div>
-
-          {/* Tag */}
+          
           <div className="input-group">
-            <label className="input-label">Tag <span style={{ color: 'var(--text-muted)' }}>(optional)</span></label>
-            <input className="input" type="text" placeholder="e.g. Social, Work, Bank…"
-              value={form.tag} onChange={set('tag')} />
+            <label className="input-label">Tag / Category (Optional)</label>
+            <input className="input" placeholder="e.g. Work, Personal" value={form.tag} onChange={set('tag')} />
           </div>
-
-          {/* Password */}
+          
           <div className="input-group">
-            <label className="input-label">Password <span style={{ color: 'var(--red)' }}>*</span></label>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <div style={{ position: 'relative', flex: 1 }}>
-                <input
-                  className="input"
-                  type={show ? 'text' : 'password'}
-                  placeholder="Enter or generate a password"
-                  value={form.password}
-                  onChange={set('password')}
-                  style={{ paddingRight: 44, fontFamily: form.password ? 'var(--font-mono)' : undefined }}
-                />
-                <button type="button" onClick={() => setShow(s => !s)}
-                  style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
-                  {show
-                    ? <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                    : <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  }
-                </button>
-              </div>
-              <button type="button" className="btn btn-ghost" onClick={fillRandom}
-                style={{ padding: '10px 14px', flexShrink: 0 }} title="Generate random password">
-                <RefreshIcon />
+            <div style={{ display: 'flex', justifyContent: 'between', alignItems: 'center', marginBottom: 2 }}>
+              <label className="input-label">Password</label>
+              <button type="button" className="btn-link" style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: 12, cursor: 'pointer', marginLeft: 'auto' }} onClick={fillRandom}>
+                Generate Random
               </button>
             </div>
+            
+            <div style={{ position: 'relative' }}>
+              <input className="input" type={show ? 'text' : 'password'} placeholder="Enter or generate password" value={form.password} onChange={set('password')} />
+            </div>
+            
             <StrengthMeter password={form.password} />
           </div>
-
-          {/* Encryption note */}
-          <div style={{
-            display: 'flex', alignItems: 'flex-start', gap: 10,
-            padding: '12px 14px', background: 'var(--gold-glow)',
-            border: '1px solid var(--gold-dim)', borderRadius: 'var(--radius)', marginTop: 4,
-          }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="2" style={{ flexShrink: 0, marginTop: 1 }}>
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
-            <p style={{ fontSize: 12, color: 'var(--gold)', lineHeight: 1.5 }}>
-              Encrypted with your master password using PBKDF2 + Fernet before storage.
-            </p>
-          </div>
-
-          <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
-            <button type="button" className="btn btn-ghost" style={{ flex: 1 }}
-              onClick={() => navigate('/dashboard')}>
-              Cancel
-            </button>
-            <button type="submit" className="btn btn-primary" style={{ flex: 1 }} disabled={loading}>
-              {loading ? <span className="spinner" /> : 'Save Password'}
-            </button>
-          </div>
+          
+          <button type="submit" className="btn btn-primary" style={{ marginTop: 8 }} disabled={loading}>
+            {loading ? <div className="spinner" /> : 'Save Password Entry'}
+          </button>
         </form>
       </div>
     </div>

@@ -9,7 +9,7 @@ async function handleResponse(res) {
   return data;
 }
 
-// Helper to bundle credentials for every request
+// Helper to bundle credentials for write requests (POST/DELETE)
 const withAuth = (payload, creds) => JSON.stringify({
   ...payload,
   mysql_user: creds.username,
@@ -35,20 +35,31 @@ export async function register(username, password, masterPassword) {
   return handleResponse(res);
 }
 
+// FIX: Restored to GET. Credentials are sent via HTTP headers because GET requests cannot have a body.
 export async function fetchPasswords(creds) {
-  const res = await fetch(`${API_BASE}/passwords/`, { // Backend uses @passwords_bp.route("/")
-    method: 'POST', // Use POST because we are sending a body
-    headers: jsonHeader,
-    body: withAuth({}, creds)
+  const res = await fetch(`${API_BASE}/passwords/`, { 
+    method: 'GET', 
+    headers: {
+      ...jsonHeader,
+      // Match the exact header names your Flask backend reads via request.headers.get()
+      'mysql-user': creds.username,
+      'mysql-password': creds.password || '',
+      'master-password': creds.masterPassword
+    }
   });
   return handleResponse(res);
 }
 
+// FIX: Restored to GET. Credentials sent via HTTP headers.
 export async function fetchPasswordById(id, creds) {
   const res = await fetch(`${API_BASE}/passwords/${id}`, {
-    method: 'POST', // Changed from GET to POST to allow body
-    headers: jsonHeader,
-    body: withAuth({}, creds)
+    method: 'GET', 
+    headers: {
+      ...jsonHeader,
+      'mysql-user': creds.username,
+      'mysql-password': creds.password || '',
+      'master-password': creds.masterPassword
+    }
   });
   return handleResponse(res);
 }

@@ -56,3 +56,23 @@ def connect():
     except Exception as exc:
         logger.exception("Unexpected error during /connect")
         return error("An unexpected server error occurred.", status=500)
+
+
+# VJ Added 
+@auth_bp.route("/register", methods=["POST"])
+def register():
+    body = request.get_json(silent=True) or {}
+    mysql_user = body.get("mysql_user")
+    mysql_password = body.get("mysql_password")
+    master_password = body.get("master_password")
+    
+    if not mysql_user or not master_password:
+        return error("Missing required registration fields.", status=400)
+
+    try:
+        # Reuses your service connection verifier to bootstrap the layout tables
+        result = verify_and_bootstrap(mysql_user, mysql_password, master_password)
+        return success(data=result, message="User registered and environment provisioned successfully.", status=201)
+    except Exception as exc:
+        logger.exception("Registration pipeline failed")
+        return error(str(exc), status=500)

@@ -41,16 +41,23 @@ logger = logging.getLogger(__name__)
 def _extract_credentials(body: dict) -> tuple[str, str, str]:
     """
     Pull mysql_user, mysql_password, master_password from a request body.
-
-    Returns:
-        (mysql_user, mysql_password, master_password)
-
-    Raises:
-        ValueError: if any required field is absent.
+    Falls back to HTTP headers if not found in the body (for GET requests).
     """
-    mysql_user = (body.get("mysql_user") or "").strip()
-    mysql_password = body.get("mysql_password") or ""
-    master_password = (body.get("master_password") or "").strip()
+    # 1. Try pulling from the JSON body payload first (for POST/DELETE)
+    mysql_user = body.get("mysql_user")
+    mysql_password = body.get("mysql_password")
+    master_password = body.get("master_password")
+
+    # 2. FIX: Fall back to incoming HTTP headers if the request is a GET (no body)
+    if not mysql_user:
+        mysql_user = request.headers.get("mysql-user")
+        mysql_password = request.headers.get("mysql-password")
+        master_password = request.headers.get("master-password")
+
+    # Clean up string bounds safely
+    mysql_user = (mysql_user or "").strip()
+    mysql_password = mysql_password or ""
+    master_password = (master_password or "").strip()
 
     missing = [f for f, v in [
         ("mysql_user", mysql_user),
