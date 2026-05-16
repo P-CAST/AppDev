@@ -31,7 +31,8 @@ const CopyIcon = () => (
 );
 
 // ── Password Detail Modal ───────────────────────────────────────
-function PasswordModal({ entry, token, masterPassword, onClose }) {
+// Changed props to pass the unified "creds" object to fit our stateless client
+function PasswordModal({ entry, creds, onClose }) {
   const [data, setData]       = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState('');
@@ -39,11 +40,11 @@ function PasswordModal({ entry, token, masterPassword, onClose }) {
   const [show, setShow]       = useState(false);
 
   useEffect(() => {
-    fetchPasswordById(entry.id, token, masterPassword)
+    fetchPasswordById(entry.id, creds)
       .then(setData)
       .catch(e => setError(e.message))
       .finally(() => setLoading(false));
-  }, [entry.id, token, masterPassword]);
+  }, [entry.id, creds]);
 
   const copyPassword = () => {
     if (!data?.password) return;
@@ -140,7 +141,8 @@ function DeleteDialog({ entry, onConfirm, onCancel, loading }) {
 
 // ── Main Dashboard ──────────────────────────────────────────────
 export default function DashboardPage() {
-  const { token, username, masterPassword, logout } = useAuth();
+  // Added "logout" mapping since it was missing from your useAuth destructuring
+  const { username, password, masterPassword, logout } = useAuth();
   const navigate = useNavigate();
 
   const [passwords, setPasswords]   = useState([]);
@@ -151,25 +153,28 @@ export default function DashboardPage() {
   const [deleting, setDeleting]     = useState(null);
   const [delLoading, setDelLoading] = useState(false);
 
+  // Grouped credential object to stay DRY
+  const credentials = { username, password, masterPassword };
+
   const loadPasswords = useCallback(async () => {
     setLoading(true);
-    setError('');
     try {
-      const data = await fetchPasswords(token);
+      const data = await fetchPasswords(credentials);
       setPasswords(data);
     } catch (e) {
       setError(e.message);
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [username, password, masterPassword]);
 
   useEffect(() => { loadPasswords(); }, [loadPasswords]);
 
   const handleDelete = async () => {
     setDelLoading(true);
     try {
-      await deletePassword(deleting.id, token);
+      // Replaced old 'token' reference with our mandatory credential bundle
+      await deletePassword(deleting.id, credentials);
       setDeleting(null);
       loadPasswords();
     } catch (e) {
@@ -270,7 +275,7 @@ export default function DashboardPage() {
                 fontFamily: 'var(--font-head)', fontWeight: 700,
                 color: 'var(--gold)', fontSize: 16, flexShrink: 0,
               }}>
-                {p.name[0].toUpperCase()}
+                {p.name ? p.name[0].toUpperCase() : '?'}
               </div>
 
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -297,8 +302,7 @@ export default function DashboardPage() {
       {viewing && (
         <PasswordModal
           entry={viewing}
-          token={token}
-          masterPassword={masterPassword}
+          creds={credentials}
           onClose={() => setViewing(null)}
         />
       )}
