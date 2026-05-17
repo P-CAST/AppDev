@@ -16,6 +16,20 @@ import { colors, theme } from '../components/theme';
 // =============================================================
 // STABLE FIELD COMPONENT (No layout-shifting structural styles)
 // =============================================================
+
+import Svg, { Rect, Path, Circle } from 'react-native-svg';
+
+function LockIcon() {
+  return (
+    <Svg width={36} height={36} viewBox="0 0 24 24" fill="none">
+      <Rect x={3} y={11} width={18} height={11} rx={2} stroke="currentColor" strokeWidth={1.5} />
+      <Path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" strokeWidth={1.5} />
+      <Circle cx={12} cy={16} r={1} fill="currentColor" />
+    </Svg>
+  );
+}
+
+
 function Field({ label, value, onChangeText, placeholder, secure, hint }) {
   const [focused, setFocused] = useState(false);
   const [show, setShow] = useState(false);
@@ -59,7 +73,7 @@ function Field({ label, value, onChangeText, placeholder, secure, hint }) {
             style={styles.eyeBtn}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <Text style={{ color: colors.textMuted, fontSize: 16 }}>{show ? '🙈' : '👁️'}</Text>
+            <Text style={{ color: colors.textMuted, fontSize: 16 }}>{show ? 'Hide' : 'Show'}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -120,11 +134,11 @@ export default function LoginScreen() {
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <View style={styles.brand}>
           <View style={styles.iconWrap}>
-            <Text style={{ fontSize: 32 }}>🔐</Text>
+            <LockIcon />
           </View>
           <Text style={[theme.heading, { fontSize: 30, textAlign: 'center' }]}>Passify</Text>
           <Text style={[theme.muted, { textAlign: 'center', marginTop: 6 }]}>
-            {isRegister ? 'Create your vault — it only takes a moment.' : 'Your vault awaits.'}
+            {isRegister ? 'Create your vault' : 'Connect to your vault'}
           </Text>
         </View>
 
@@ -162,7 +176,7 @@ export default function LoginScreen() {
           onChangeText={set('masterPassword')} 
           placeholder="Vault encryption key" 
           secure 
-          hint="Used strictly to encrypt your items. Never stored on server."
+          hint="Never stored on server."
         />
 
         {isRegister && (
@@ -190,7 +204,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   scroll: { flexGrow: 1, justifyContent: 'center', padding: 24, backgroundColor: colors.bg },
   brand: { alignItems: 'center', marginBottom: 28 },
-  iconWrap: { width: 72, height: 72, backgroundColor: colors.goldGlow, borderRadius: 18, borderWidth: 1, borderColor: colors.goldDim, alignItems: 'center', justifyContent: 'center', marginBottom: 14 },
+  iconWrap: { width: 72, height: 72, backgroundColor: colors.goldDim, borderRadius: 18, borderWidth: 1, borderColor: colors.goldDim, alignItems: 'center', justifyContent: 'center', marginBottom: 14 },
   tabBar: { flexDirection: 'row', backgroundColor: colors.surface, borderRadius: 12, borderWidth: 1, borderColor: colors.border, padding: 4, marginBottom: 16 },
   tab: { flex: 1, paddingVertical: 11, borderRadius: 9, alignItems: 'center', justifyContent: 'center' },
   tabActive: { backgroundColor: colors.gold },
