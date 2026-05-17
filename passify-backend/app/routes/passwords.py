@@ -81,7 +81,7 @@ def _open_conn(mysql_user: str, mysql_password: str):
 # GET /api/passwords/
 # ---------------------------------------------------------------------------
 
-@passwords_bp.route("/", methods=["GET", "POST"])
+@passwords_bp.route("/", methods=["GET"])
 def list_entries():
     """
     List all password entries (no decryption performed).
@@ -119,7 +119,7 @@ def list_entries():
 # GET /api/passwords/<int:entry_id>
 # ---------------------------------------------------------------------------
 
-@passwords_bp.route("/<int:entry_id>", methods=["GET", "POST"])
+@passwords_bp.route("/<int:entry_id>", methods=["GET"])
 def get_entry(entry_id: int):
     """
     Decrypt and return a single password entry.
