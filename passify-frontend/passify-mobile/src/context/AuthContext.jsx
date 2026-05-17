@@ -4,32 +4,46 @@ import { login as apiLogin, register as apiRegister } from '../api/client';
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [token, setToken]                   = useState(null);
-  const [username, setUsername]             = useState(null);
+  const [username, setUsername] = useState(null);
+  const [password, setPassword] = useState(null);
   const [masterPassword, setMasterPassword] = useState(null);
 
-  const _persist = (token, username, master) => {
-    setToken(token); setUsername(username); setMasterPassword(master);
+  const _persist = (user, pwd, master) => {
+    setUsername(user);
+    setPassword(pwd);
+    setMasterPassword(master);
   };
 
-  const login = useCallback(async (user, password, master) => {
-    const data = await apiLogin(user, password, master);
-    _persist(data.token, data.username, master);
+  const login = useCallback(async (user, pwd, master) => {
+    const data = await apiLogin(user, pwd, master);
+    _persist(user, pwd, master);
     return data;
   }, []);
 
-  const register = useCallback(async (user, password, master) => {
-    const data = await apiRegister(user, password, master);
-    _persist(data.token, data.username, master);
+  const register = useCallback(async (user, pwd, master) => {
+    const data = await apiRegister(user, pwd, master);
+    _persist(user, pwd, master);
     return data;
   }, []);
 
   const logout = useCallback(() => {
-    setToken(null); setUsername(null); setMasterPassword(null);
+    setUsername(null);
+    setPassword(null);
+    setMasterPassword(null);
   }, []);
 
   return (
-    <AuthContext.Provider value={{ token, username, masterPassword, login, register, logout, isLoggedIn: !!token }}>
+    <AuthContext.Provider
+      value={{
+        username,
+        password,
+        masterPassword,
+        login,
+        register,
+        logout,
+        isLoggedIn: password !== null && username !== null,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
