@@ -31,7 +31,14 @@ function PasswordModal({ entry, creds, visible, onClose }) {
     setShow(false);
 
     fetchPasswordById(entry.id, creds)
-      .then(setData)
+      .then((res) => {
+        // FIX: Extract data cleanly from response envelope wrapper
+        if (res && res.success) {
+          setData(res.data);
+        } else {
+          setError('Could not read decryption package.');
+        }
+      })
       .catch(e => setError(e.message))
       .finally(() => setLoading(false));
   }, [visible, entry]);
@@ -80,16 +87,20 @@ function PasswordModal({ entry, creds, visible, onClose }) {
 }
 
 function PasswordCard({ item, onView, onDelete }) {
+  // Defensive fallbacks to avoid layout rendering faults
+  const displayName = item?.name || 'Unknown Item';
+  const displayTag = item?.tag || '';
+
   return (
     <View style={styles.entryCard}>
       <View style={styles.avatar}>
-        <Text style={styles.avatarText}>{item.name[0].toUpperCase()}</Text>
+        <Text style={styles.avatarText}>{displayName[0].toUpperCase()}</Text>
       </View>
       <View style={{ flex: 1, marginLeft: 12 }}>
-        <Text style={theme.subheading}>{item.name}</Text>
-        {item.tag ? (
+        <Text style={theme.subheading}>{displayName}</Text>
+        {displayTag ? (
           <View style={[theme.tag, { marginTop: 4, alignSelf: 'flex-start' }]}>
-            <Text style={theme.tagText}>{item.tag}</Text>
+            <Text style={theme.tagText}>{displayTag}</Text>
           </View>
         ) : null}
       </View>
@@ -122,10 +133,17 @@ export default function DashboardScreen({ navigation }) {
     else setLoading(true);
     setError('');
     try {
-      const data = await fetchPasswords(credentials);
-      setPasswords(data);
+      const res = await fetchPasswords(credentials);
+      
+      // FIX: Check payload structure and assign inner data array element safely
+      if (res && res.success && Array.isArray(res.data)) {
+        setPasswords(res.data);
+      } else {
+        setPasswords([]);
+      }
     } catch (e) {
       setError(e.message || 'Failed to populate vault.');
+      setPasswords([]); 
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -165,11 +183,13 @@ export default function DashboardScreen({ navigation }) {
     ]);
   };
 
-  const filtered = passwords.filter(
-    p =>
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
-      (p.tag || '').toLowerCase().includes(search.toLowerCase())
-  );
+  // FIX: Added defensive check layout arrays fallback logic to safeguard .filter executions
+  const filtered = (passwords || []).filter(p => {
+    if (!p) return false;
+    const nameMatch = p.name ? p.name.toLowerCase().includes(search.toLowerCase()) : false;
+    const tagMatch = p.tag ? p.tag.toLowerCase().includes(search.toLowerCase()) : false;
+    return nameMatch || tagMatch;
+  });
 
   return (
     <SafeAreaView style={theme.safeArea} edges={['top']}>
