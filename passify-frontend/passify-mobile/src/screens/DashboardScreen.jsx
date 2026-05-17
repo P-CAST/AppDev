@@ -74,7 +74,7 @@ function PasswordModal({ entry, creds, visible, onClose }) {
                     {show ? data?.password : '••••••••••••••••'}
                   </Text>
                   <TouchableOpacity onPress={() => setShow(!show)} style={styles.iconBtn}>
-                    <Text style={{ fontSize: 16 }}>{show ? '🙈' : '👁️'}</Text>
+                    <Text style={{ fontSize: 16 }}>{show ? 'Hide' : 'Show'}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -106,10 +106,10 @@ function PasswordCard({ item, onView, onDelete }) {
       </View>
       <View style={{ flexDirection: 'row', gap: 8 }}>
         <TouchableOpacity onPress={() => onView(item)} style={styles.cardBtn}>
-          <Text style={{ color: colors.gold }}>👁️</Text>
+          <Text style={{ color: colors.gold }}>Show</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => onDelete(item)} style={styles.cardBtn}>
-          <Text style={{ color: colors.red }}>🗑️</Text>
+          <Text style={{ color: colors.red }}>Remove</Text>
         </TouchableOpacity>
       </View>
     </View>

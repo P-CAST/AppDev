@@ -158,13 +158,13 @@ export default function AddPasswordScreen({ navigation }) {
                 autoCapitalize="none"
               />
               <TouchableOpacity onPress={() => setShowPwd(!showPwd)} style={styles.eyeBtn}>
-                <Text style={{ fontSize: 16 }}>{showPwd ? '🙈' : '👁️'}</Text>
+                <Text style={{ fontSize: 16 }}>{showPwd ? 'Hide' : 'Show'}</Text>
               </TouchableOpacity>
             </View>
             <StrengthMeter password={form.password} />
 
             <TouchableOpacity onPress={fillRandom} style={styles.generateBtn}>
-              <Text style={{ color: colors.gold, fontWeight: '600', fontSize: 13 }}>⚡ Generate Strong Password</Text>
+              <Text style={{ color: colors.gold, fontWeight: '600', fontSize: 13 }}>Generate Strong Password</Text>
             </TouchableOpacity>
           </View>
 
