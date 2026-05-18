@@ -1,0 +1,35 @@
+# --- Node / React (Frontend) ---
+node_modules/
+dist/
+dist-ssr/
+*.local
+.eslintcache
+
+# --- Python / Flask (Backend) ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv
+venv/
+ENV/
+.env
+.flaskenv
+
+# --- Database / Storage ---
+*.sqlite3
+*.db
+# If your backend generates local logs
+*.log
+
+# --- Operating System ---
+.DS_Store
+Thumbs.db
+
+# --- Editors ---
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
