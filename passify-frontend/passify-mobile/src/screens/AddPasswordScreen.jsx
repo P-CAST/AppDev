@@ -105,7 +105,7 @@ export default function AddPasswordScreen({ navigation }) {
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
           <View style={styles.topBar}>
             <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-              <Text style={{ color: colors.textMuted, fontSize: 15 }}>← Back</Text>
+              <Text style={{ color: colors.textMuted, fontSize: 15 }}>Back</Text>
             </TouchableOpacity>
           </View>
 
@@ -170,7 +170,7 @@ export default function AddPasswordScreen({ navigation }) {
 
           <View style={styles.encNote}>
             <Text style={{ color: colors.gold, fontSize: 12, lineHeight: 16 }}>
-              🛡️ This record will be encrypted locally using your Master Password before submission.
+              This record will be encrypted locally using your Master Password before submission.
             </Text>
           </View>
 
