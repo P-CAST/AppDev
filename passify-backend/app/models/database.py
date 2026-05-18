@@ -1,12 +1,3 @@
-"""
-models/database.py
-------------------
-Low-level MySQL data-access layer.
-
-All functions accept an explicit `connection` object so the service layer
-controls connection lifetime and there are no hidden global side-effects.
-"""
-
 from __future__ import annotations
 
 import logging
@@ -21,12 +12,8 @@ logger = logging.getLogger(__name__)
 
 
 def get_connection(mysql_user: str, mysql_password: str) -> mysql.connector.MySQLConnection:
-    """
-    Open and return a MySQL connection for the given credentials.
-
-    Raises:
-        ConnectionError: if the connection cannot be established.
-    """
+    
+    # open and return a MySQL connection for the given credentials.
     try:
         conn = mysql.connector.connect(
             host=current_app.config["MYSQL_HOST"],
@@ -44,13 +31,6 @@ def get_connection(mysql_user: str, mysql_password: str) -> mysql.connector.MySQ
 
 
 def ensure_schema(conn: mysql.connector.MySQLConnection, login_user: str) -> None:
-    """
-    Create the per-user database and table if they do not already exist.
-
-    Naming mirrors the original project:
-        database : db_password_<login_user>
-        table    : tb_<login_user>
-    """
     db_name = _db_name(login_user)
     table_name = _table_name(login_user)
 
@@ -78,7 +58,6 @@ def list_entries(
     conn: mysql.connector.MySQLConnection,
     login_user: str,
 ) -> List[dict]:
-    """Return all (id, name, tag) rows — never the encrypted password."""
     sql = f"SELECT id, name, tag FROM `{_db_name(login_user)}`.`{_table_name(login_user)}`"
     with conn.cursor(dictionary=True) as cur:
         cur.execute(sql)
@@ -90,10 +69,6 @@ def fetch_entry_raw(
     login_user: str,
     entry_id: int,
 ) -> Optional[dict]:
-    """
-    Return the full raw row (id, name, tag, password BLOB, salt BLOB)
-    for a given id, or None if it does not exist.
-    """
     sql = (
         f"SELECT id, name, tag, password, salt "
         f"FROM `{_db_name(login_user)}`.`{_table_name(login_user)}` "
@@ -112,9 +87,8 @@ def insert_entry(
     encrypted_password: bytes,
     salt: bytes,
 ) -> int:
-    """
-    Insert a new password entry and return the newly created row id.
-    """
+
+    # Insert a new password entry and return the newly created row id.
     sql = (
         f"INSERT INTO `{_db_name(login_user)}`.`{_table_name(login_user)}` "
         f"(name, tag, password, salt) VALUES (%s, %s, %s, %s)"
@@ -132,12 +106,9 @@ def delete_entry(
     login_user: str,
     entry_id: int,
 ) -> int:
-    """
-    Delete the row with the given id.
 
-    Returns:
-        Number of rows deleted (0 if the id did not exist).
-    """
+    # Delete the row with the given id.
+
     sql = (
         f"DELETE FROM `{_db_name(login_user)}`.`{_table_name(login_user)}` "
         f"WHERE id = %s"

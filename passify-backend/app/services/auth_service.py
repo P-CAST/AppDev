@@ -1,11 +1,4 @@
-"""
-services/auth_service.py
-------------------------
-Handles MySQL connection verification and schema bootstrap.
 
-The service validates credentials by actually opening a connection.
-No passwords are stored server-side beyond the lifetime of a request.
-"""
 
 from __future__ import annotations
 

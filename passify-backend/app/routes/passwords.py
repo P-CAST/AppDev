@@ -20,10 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 def _extract_credentials(body: dict) -> tuple[str, str, str]:
-    """
-    Pull mysql_user, mysql_password, master_password from a request body.
-    Falls back to HTTP headers if not found in the body (for GET requests).
-    """
+
     mysql_user = body.get("mysql_user")
     mysql_password = body.get("mysql_password")
     master_password = body.get("master_password")
@@ -49,7 +46,7 @@ def _extract_credentials(body: dict) -> tuple[str, str, str]:
 
 
 def _open_conn(mysql_user: str, mysql_password: str):
-    """Open a connection and ensure schema; caller must close it."""
+    # Open a connection and ensure schema; caller must close it.
     conn = get_connection(mysql_user, mysql_password)
     ensure_schema(conn, mysql_user)
     return conn
@@ -58,15 +55,6 @@ def _open_conn(mysql_user: str, mysql_password: str):
 # GET /api/passwords/
 @passwords_bp.route("/", methods=["GET"])
 def list_entries():
-    """
-    List all password entries (no decryption performed).
-
-    Request JSON:
-        { "mysql_user": "...", "mysql_password": "...", "master_password": "..." }
-
-    Response 200:
-        { "success": true, "data": [ { "id": 1, "name": "...", "tag": "..." }, ... ] }
-    """
     body = request.get_json(silent=True) or {}
     try:
         mysql_user, mysql_password, master_password = _extract_credentials(body)
@@ -93,21 +81,6 @@ def list_entries():
 # GET /api/passwords/<int:entry_id>
 @passwords_bp.route("/<int:entry_id>", methods=["GET"])
 def get_entry(entry_id: int):
-    """
-    Decrypt and return a single password entry.
-
-    Request JSON:
-        { "mysql_user": "...", "mysql_password": "...", "master_password": "..." }
-
-    Response 200:
-        { "success": true, "data": { "id": 1, "name": "...", "tag": "...", "password": "..." } }
-
-    Response 404:
-        { "success": false, "message": "No entry with id=<n>." }
-
-    Response 401:
-        { "success": false, "message": "Decryption failed: ..." }
-    """
     body = request.get_json(silent=True) or {}
     try:
         mysql_user, mysql_password, master_password = _extract_credentials(body)
@@ -138,22 +111,7 @@ def get_entry(entry_id: int):
 # POST /api/passwords/
 @passwords_bp.route("/", methods=["POST"])
 def create_entry():
-    """
-    Create a new encrypted password entry.
-
-    Request JSON:
-        {
-            "mysql_user":      "...",
-            "mysql_password":  "...",
-            "master_password": "...",
-            "name":            "<string, required>",
-            "tag":             "<string, optional>",
-            "password":        "<string, required>"
-        }
-
-    Response 201:
-        { "success": true, "message": "Password saved.", "data": { "id": ..., "name": "...", "tag": "..." } }
-    """
+    
     body = request.get_json(silent=True) or {}
     try:
         mysql_user, mysql_password, master_password = _extract_credentials(body)
@@ -187,18 +145,7 @@ def create_entry():
 # DELETE /api/passwords/<int:entry_id>
 @passwords_bp.route("/<int:entry_id>", methods=["DELETE"])
 def delete_entry(entry_id: int):
-    """
-    Delete a password entry by id.
-
-    Request JSON:
-        { "mysql_user": "...", "mysql_password": "...", "master_password": "..." }
-
-    Response 200:
-        { "success": true, "message": "Entry deleted.", "data": { "deleted_id": <n> } }
-
-    Response 404:
-        { "success": false, "message": "Entry not found." }
-    """
+    
     body = request.get_json(silent=True) or {}
     try:
         mysql_user, mysql_password, master_password = _extract_credentials(body)

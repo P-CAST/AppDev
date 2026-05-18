@@ -42,12 +42,6 @@ def view_password(
     master_password: str,
     iterations: int,
 ) -> dict:
-    """
-    Decrypt and return the password for the entry identified by *entry_id*.
-    Returns:
-        dict with keys: id, name, tag, password
-
-    """
     row = db.fetch_entry_raw(conn, login_user, entry_id)
     if row is None:
         raise KeyError(f"No entry with id={entry_id}.")
@@ -75,13 +69,7 @@ def create_password(
     master_password: str,
     iterations: int,
 ) -> dict:
-    """
-    Encrypt *plain_password* and persist the new entry.
 
-    Returns:
-        dict with the new entry's id, name, and tag.
-
-    """
     name = name.strip()
     plain_password = plain_password.strip()
 
@@ -101,10 +89,5 @@ def remove_password(
     login_user: str,
     entry_id: int,
 ) -> int:
-    """
-    Delete the entry with *entry_id*.
 
-    Returns:
-        Number of rows deleted (0 means the id did not exist).
-    """
     return db.delete_entry(conn, login_user, entry_id)
