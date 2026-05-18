@@ -222,7 +222,7 @@ export default function DashboardPage() {
       <div style={{ marginBottom: 20 }}>
         <input
           className="input"
-          placeholder="Search by name or tag…"
+          placeholder="Search by name or tag"
           value={search}
           onChange={e => setSearch(e.target.value)}
           style={{ maxWidth: 320 }}

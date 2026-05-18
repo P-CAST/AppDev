@@ -99,7 +99,7 @@ export default function GeneratorPage() {
 
         {generatedPassword && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <label className="input-label">Generated Result</label>
+            <label className="input-label">Generated Password</label>
             <div style={{ display: 'flex', gap: 10 }}>
               <input 
                 className="input" 
