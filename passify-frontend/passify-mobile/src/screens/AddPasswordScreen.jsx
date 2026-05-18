@@ -124,7 +124,7 @@ export default function AddPasswordScreen({ navigation }) {
           ) : null}
 
           <View style={{ marginBottom: 14 }}>
-            <Text style={theme.label}>Service Name</Text>
+            <Text style={theme.label}>Name</Text>
             <TextInput
               style={theme.input}
               placeholder="e.g., Google, Netflix"

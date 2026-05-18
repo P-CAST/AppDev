@@ -112,7 +112,7 @@ export default function AddPasswordPage() {
         
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           <div className="input-group">
-            <label className="input-label">Service Name</label>
+            <label className="input-label">Name</label>
             <input className="input" placeholder="e.g. Google, GitHub" value={form.name} onChange={set('name')} />
           </div>
           

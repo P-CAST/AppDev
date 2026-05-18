@@ -215,7 +215,7 @@ export default function DashboardScreen({ navigation }) {
           style={[theme.btnGhost, { marginBottom: 16 }]} 
           onPress={() => navigation.navigate('Generator')}
         >
-          <Text style={theme.btnGhostText}>Open Password Generator</Text>
+          <Text style={theme.btnGhostText}>Password Generator</Text>
         </TouchableOpacity>
         <TouchableOpacity style={theme.btnPrimary} onPress={() => navigation.navigate('AddPassword')}>
           <Text style={theme.btnPrimaryText}>+</Text>
