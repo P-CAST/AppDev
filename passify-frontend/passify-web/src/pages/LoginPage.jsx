@@ -117,7 +117,7 @@ export default function LoginPage() {
             Passify
           </h1>
           <p style={{ color: 'var(--text-muted)', fontSize: 14, marginTop: 6 }}>
-            {isRegister ? 'Create your vault — it only takes a moment.' : 'Your vault awaits. Enter your credentials.'}
+            {isRegister ? 'Create your vault' : 'Connect to your vault'}
           </p>
         </div>
 
@@ -134,7 +134,7 @@ export default function LoginPage() {
               background: mode === m ? 'var(--gold)' : 'transparent',
               color: mode === m ? '#000' : 'var(--text-muted)',
             }}>
-              {m === 'login' ? '🔓 Sign In' : '✨ Create Vault'}
+              {m === 'login' ? 'Sign In' : 'Create Vault'}
             </button>
           ))}
         </div>
@@ -154,7 +154,7 @@ export default function LoginPage() {
               onChange={set('masterPassword')}
               placeholder={isRegister ? 'Choose a strong master password' : 'Your encryption key'}
               isPassword
-              hint="Never stored — used only to derive your encryption key."
+              hint="Never stored on server."
             />
 
             {/* Confirm field — only on register */}
@@ -175,10 +175,8 @@ export default function LoginPage() {
                 padding: '12px 14px', background: 'var(--gold-glow)',
                 border: '1px solid var(--gold-dim)', borderRadius: 10,
               }}>
-                <span style={{ fontSize: 16, flexShrink: 0 }}>🛡️</span>
-                <p style={{ fontSize: 12, color: 'var(--gold)', lineHeight: 1.6 }}>
-                  This will create a new encrypted vault database (<code style={{ fontFamily: 'var(--font-mono)', background: 'rgba(0,0,0,0.2)', padding: '1px 5px', borderRadius: 4 }}>db_password_{form.username || 'username'}</code>) on your MySQL server.
-                  Your master password is never stored — if you forget it, your data cannot be recovered.
+                <p style={{ fontSize: 12, color: 'var(--gold)', lineHeight: 1.6, textAlign: 'center' }}>
+                  This will create a new encrypted vault database "db_password_{form.username || 'username'}"" on your MySQL server.
                 </p>
               </div>
             )}
@@ -191,7 +189,7 @@ export default function LoginPage() {
             >
               {loading
                 ? <span className="spinner" />
-                : isRegister ? '✨ Create My Vault' : '🔓 Unlock Vault'
+                : isRegister ? 'Create My Vault' : 'Unlock Vault'
               }
             </button>
           </form>
@@ -207,10 +205,6 @@ export default function LoginPage() {
             </button>
           </p>
         </div>
-
-        <p style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-muted)', marginTop: 20 }}>
-          Passify — POC · Encrypted with PBKDF2 + Fernet
-        </p>
       </div>
     </div>
   );

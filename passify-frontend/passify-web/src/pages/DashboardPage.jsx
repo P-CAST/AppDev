@@ -30,8 +30,6 @@ const CopyIcon = () => (
   </svg>
 );
 
-// ── Password Detail Modal ───────────────────────────────────────
-// Changed props to pass the unified "creds" object to fit our stateless client
 function PasswordModal({ entry, creds, onClose }) {
   const [data, setData]       = useState(null);
   const [loading, setLoading] = useState(true);
@@ -41,7 +39,14 @@ function PasswordModal({ entry, creds, onClose }) {
 
   useEffect(() => {
     fetchPasswordById(entry.id, creds)
-      .then(setData)
+      .then(res => {
+        // Unpack the backend envelope safely
+        if (res && res.data) {
+          setData(res.data);
+        } else {
+          setData(res);
+        }
+      })
       .catch(e => setError(e.message))
       .finally(() => setLoading(false));
   }, [entry.id, creds]);
@@ -74,7 +79,7 @@ function PasswordModal({ entry, creds, onClose }) {
         <div style={{ padding: '24px' }}>
           {loading && <div style={{ display: 'flex', justifyContent: 'center' }}><span className="spinner" /></div>}
           {error   && <div className="msg-error">{error}</div>}
-          {data && (
+          {data && data.password && (
             <div>
               <div className="input-label" style={{ marginBottom: 8 }}>Password</div>
               <div style={{
@@ -109,7 +114,6 @@ function PasswordModal({ entry, creds, onClose }) {
     </div>
   );
 }
-
 // ── Delete Confirm Dialog ───────────────────────────────────────
 function DeleteDialog({ entry, onConfirm, onCancel, loading }) {
   return (
