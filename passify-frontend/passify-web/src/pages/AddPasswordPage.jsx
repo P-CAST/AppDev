@@ -101,7 +101,7 @@ export default function AddPasswordPage() {
   return (
     <div className="page" style={{ alignItems: 'stretch', maxWidth: 520, margin: '0 auto' }}>
       <button className="btn btn-ghost" style={{ alignSelf: 'flex-start', marginBottom: 24, padding: '7px 14px' }} onClick={() => navigate('/dashboard')}>
-        Back to Vault
+        Back
       </button>
       
       <div className="card">

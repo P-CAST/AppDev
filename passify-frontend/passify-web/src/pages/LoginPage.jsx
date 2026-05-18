@@ -116,7 +116,7 @@ export default function LoginPage() {
             Passify
           </h1>
           <p style={{ color: 'var(--text-muted)', fontSize: 14, marginTop: 6 }}>
-            {isRegister ? 'Create your vault' : 'Connect to your vault'}
+            {isRegister ? 'Create your vault' : 'Connect to vault'}
           </p>
         </div>
 
@@ -153,7 +153,7 @@ export default function LoginPage() {
               onChange={set('masterPassword')}
               placeholder={isRegister ? 'Choose a strong master password' : 'Your encryption key'}
               isPassword
-              hint="Never stored on server."
+              hint="This is never stored on server"
             />
 
             {isRegister && (
