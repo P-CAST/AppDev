@@ -6,6 +6,7 @@ import LoginScreen      from '../screens/LoginScreen';
 import DashboardScreen  from '../screens/DashboardScreen';
 import AddPasswordScreen from '../screens/AddPasswordScreen';
 import { colors } from '../components/theme';
+import GeneratorScreen from '../screens/GeneratorScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -29,6 +30,7 @@ export default function AppNavigator() {
           <>
             <Stack.Screen name="Dashboard"   component={DashboardScreen}  />
             <Stack.Screen name="AddPassword" component={AddPasswordScreen} />
+            <Stack.Screen name="Generator" component={GeneratorScreen} />
           </>
         )}
       </Stack.Navigator>

@@ -88,8 +88,8 @@ function PasswordModal({ entry, creds, visible, onClose }) {
 
 function PasswordCard({ item, onView, onDelete }) {
   // Defensive fallbacks to avoid layout rendering faults
-  const displayName = item?.name || 'Unknown Item';
-  const displayTag = item?.tag || '';
+  const displayName = item?.name || item?.site_name || 'Unknown Item';
+  const displayTag = item?.tag || item?.category || '';
 
   return (
     <View style={styles.entryCard}>
@@ -104,7 +104,7 @@ function PasswordCard({ item, onView, onDelete }) {
           </View>
         ) : null}
       </View>
-      <View style={{ flexDirection: 'row', gap: 8 }}>
+      <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'nowrap', alignItems: 'center',}}>
         <TouchableOpacity onPress={() => onView(item)} style={styles.cardBtn}>
           <Text style={{ color: colors.gold }}>Show</Text>
         </TouchableOpacity>
@@ -206,11 +206,17 @@ export default function DashboardScreen({ navigation }) {
       <View style={styles.toolbar}>
         <TextInput
           style={[theme.input, { flex: 1 }]}
-          placeholder="Search vault..."
+          placeholder="Search vault"
           placeholderTextColor={colors.textMuted}
           value={search}
           onChangeText={setSearch}
         />
+        <TouchableOpacity 
+          style={[theme.btnGhost, { marginBottom: 16 }]} 
+          onPress={() => navigation.navigate('Generator')}
+        >
+          <Text style={theme.btnGhostText}>Open Password Generator</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={theme.btnPrimary} onPress={() => navigation.navigate('AddPassword')}>
           <Text style={theme.btnPrimaryText}>+</Text>
         </TouchableOpacity>
@@ -274,7 +280,7 @@ const styles = StyleSheet.create({
   entryCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surface, borderRadius: 12, borderWidth: 1, borderColor: colors.border, padding: 14, marginBottom: 8 },
   avatar: { width: 42, height: 42, borderRadius: 10, backgroundColor: colors.goldGlow, borderWidth: 1, borderColor: colors.goldDim, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   avatarText: { color: colors.gold, fontSize: 16, fontWeight: '700' },
-  cardBtn: { width: 36, height: 36, borderRadius: 8, backgroundColor: colors.surface2, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
+  cardBtn: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, backgroundColor: colors.surface2, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.75)', alignItems: 'center', justifyContent: 'center', padding: 20 },
   modalCard: { width: '100%', maxWidth: 400, backgroundColor: colors.surface, borderRadius: 16, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
   modalHeader: { flexDirection: 'row', alignItems: 'center', padding: 18, borderBottomWidth: 1, borderBottomColor: colors.border },

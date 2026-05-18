@@ -217,6 +217,9 @@ export default function DashboardPage() {
           <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>Welcome back, {username}</p>
         </div>
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+          <button className="btn btn-ghost" onClick={() => navigate('/generator')}>
+            Password Generator
+          </button>
           <button className="btn btn-primary" onClick={() => navigate('/add')}>
             <PlusIcon /> New Password
           </button>

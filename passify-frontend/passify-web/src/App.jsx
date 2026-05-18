@@ -4,6 +4,9 @@ import LoginPage       from './pages/LoginPage';
 import DashboardPage   from './pages/DashboardPage';
 import AddPasswordPage from './pages/AddPasswordPage';
 import './index.css';
+import GeneratorPage from './pages/GeneratorPage';
+
+
 
 function ProtectedRoute({ children }) {
   const { isLoggedIn } = useAuth();
@@ -23,6 +26,7 @@ export default function App() {
           <Route path="/" element={<PublicRoute><LoginPage /></PublicRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
           <Route path="/add"       element={<ProtectedRoute><AddPasswordPage /></ProtectedRoute>} />
+          <Route path="/generator" element={<ProtectedRoute><GeneratorPage /></ProtectedRoute>}  />
           <Route path="*"          element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
