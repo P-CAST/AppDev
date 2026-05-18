@@ -72,22 +72,19 @@ def register():
         return error("Missing required registration fields.", status=400)
 
     try:
-        # STEP 1: Connect as the XAMPP administrator ('root') to provision the new account
         admin_conn = pymysql.connect(
             host='localhost',
             user='root',
-            password='',  # Default XAMPP root password is empty
+            password='',  # default XAMPP root password is empty
             autocommit=True
         )
         admin_cursor = admin_conn.cursor()
 
-        # STEP 2: Tell MySQL to create the new user account and grant full table privileges
         admin_cursor.execute(f"CREATE USER IF NOT EXISTS '{mysql_user}'@'localhost' IDENTIFIED BY '{mysql_password}';")
         admin_cursor.execute(f"GRANT ALL PRIVILEGES ON *.* TO '{mysql_user}'@'localhost' WITH GRANT OPTION;")
         admin_cursor.execute("FLUSH PRIVILEGES;")
         admin_conn.close()
 
-        # STEP 3: Now log in AS the newly created user to build their custom table space
         user_conn = pymysql.connect(
             host='localhost',
             user=mysql_user,
@@ -96,11 +93,9 @@ def register():
         )
         user_cursor = user_conn.cursor()
 
-        # Create a universal schema database if it doesn't exist, then target it
         user_cursor.execute("CREATE DATABASE IF NOT EXISTS passify_vault;")
         user_conn.select_db("passify_vault")
 
-        # Generate the unique table matching their relational username
         table_name = f"db_password_{mysql_user.lower()}"
         user_cursor.execute(f"""
             CREATE TABLE IF NOT EXISTS {table_name} (

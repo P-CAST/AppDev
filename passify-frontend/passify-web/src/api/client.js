@@ -1,5 +1,4 @@
-// client.js
-export const API_BASE = 'http://localhost:8123/api'; // Port from your terminal output
+export const API_BASE = 'http://localhost:8123/api'; 
 
 const jsonHeader = { 'Content-Type': 'application/json' };
 
@@ -9,7 +8,6 @@ async function handleResponse(res) {
   return data;
 }
 
-// Helper to bundle credentials for write requests (POST/DELETE)
 const withAuth = (payload, creds) => JSON.stringify({
   ...payload,
   mysql_user: creds.username,
@@ -35,13 +33,11 @@ export async function register(username, password, masterPassword) {
   return handleResponse(res);
 }
 
-// FIX: Restored to GET. Credentials are sent via HTTP headers because GET requests cannot have a body.
 export async function fetchPasswords(creds) {
   const res = await fetch(`${API_BASE}/passwords/`, { 
     method: 'GET', 
     headers: {
       ...jsonHeader,
-      // Match the exact header names your Flask backend reads via request.headers.get()
       'mysql-user': creds.username,
       'mysql-password': creds.password || '',
       'master-password': creds.masterPassword
@@ -50,7 +46,6 @@ export async function fetchPasswords(creds) {
   return handleResponse(res);
 }
 
-// FIX: Restored to GET. Credentials sent via HTTP headers.
 export async function fetchPasswordById(id, creds) {
   const res = await fetch(`${API_BASE}/passwords/${id}`, {
     method: 'GET', 

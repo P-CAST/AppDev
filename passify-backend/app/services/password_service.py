@@ -1,16 +1,3 @@
-"""
-services/password_service.py
------------------------------
-Business logic for password CRUD operations.
-
-Each function:
-  - accepts plain Python values (no Flask Request/Response objects)
-  - returns plain Python values or raises descriptive exceptions
-  - delegates all DB I/O to ``app.models.database``
-  - delegates all crypto to ``app.utils.crypto``
-
-This keeps the service layer independently testable.
-"""
 
 from __future__ import annotations
 
@@ -25,12 +12,7 @@ from app.utils.crypto import encrypt_password, decrypt_password
 logger = logging.getLogger(__name__)
 
 
-# ---------------------------------------------------------------------------
-# DTOs (lightweight dataclasses used as return shapes)
-# ---------------------------------------------------------------------------
-
 class PasswordEntry:
-    """Public-safe representation of a stored entry (no raw ciphertext)."""
 
     __slots__ = ("id", "name", "tag")
 
@@ -43,9 +25,6 @@ class PasswordEntry:
         return {"id": self.id, "name": self.name, "tag": self.tag or ""}
 
 
-# ---------------------------------------------------------------------------
-# Service functions
-# ---------------------------------------------------------------------------
 
 def list_passwords(conn: mysql.connector.MySQLConnection, login_user: str) -> List[dict]:
     """
@@ -65,13 +44,9 @@ def view_password(
 ) -> dict:
     """
     Decrypt and return the password for the entry identified by *entry_id*.
-
     Returns:
         dict with keys: id, name, tag, password
 
-    Raises:
-        KeyError:   if the entry does not exist.
-        ValueError: if the master password is incorrect.
     """
     row = db.fetch_entry_raw(conn, login_user, entry_id)
     if row is None:
@@ -106,8 +81,6 @@ def create_password(
     Returns:
         dict with the new entry's id, name, and tag.
 
-    Raises:
-        ValueError: if required fields are blank.
     """
     name = name.strip()
     plain_password = plain_password.strip()

@@ -21,26 +21,6 @@ def verify_and_bootstrap(
     mysql_password: str,
     master_password: str,
 ) -> dict:
-    """
-    Attempt to connect to MySQL with the supplied credentials and ensure the
-    per-user schema exists.
-
-    Args:
-        mysql_user:      MySQL username (also used as the logical owner of the
-                         password vault).
-        mysql_password:  MySQL password for the above user.
-        master_password: The encryption master password.  We intentionally do
-                         NOT store or validate this here — it is the caller's
-                         responsibility to pass the correct value on each
-                         subsequent request.
-
-    Returns:
-        dict: {"mysql_user": str} on success.
-
-    Raises:
-        ConnectionError: if the database connection fails.
-        ValueError:      if required fields are missing.
-    """
     mysql_user = (mysql_user or "").strip()
     mysql_password = mysql_password or ""
     master_password = (master_password or "").strip()

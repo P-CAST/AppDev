@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { fetchPasswords, deletePassword, fetchPasswordById } from '../api/client';
 
-// ── Icons ───────────────────────────────────────────────────────
 const PlusIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
     <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
@@ -40,7 +39,6 @@ function PasswordModal({ entry, creds, onClose }) {
   useEffect(() => {
     fetchPasswordById(entry.id, creds)
       .then(res => {
-        // Unpack the backend envelope safely
         if (res && res.data) {
           setData(res.data);
         } else {
@@ -66,7 +64,6 @@ function PasswordModal({ entry, creds, onClose }) {
       display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
     }} onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="card fade-up" style={{ width: '100%', maxWidth: 440, gap: 0, padding: 0, overflow: 'hidden' }}>
-        {/* Header */}
         <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: 17 }}>{entry.name}</div>
@@ -75,7 +72,6 @@ function PasswordModal({ entry, creds, onClose }) {
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 20, lineHeight: 1 }}>×</button>
         </div>
 
-        {/* Body */}
         <div style={{ padding: '24px' }}>
           {loading && <div style={{ display: 'flex', justifyContent: 'center' }}><span className="spinner" /></div>}
           {error   && <div className="msg-error">{error}</div>}
@@ -114,7 +110,6 @@ function PasswordModal({ entry, creds, onClose }) {
     </div>
   );
 }
-// ── Delete Confirm Dialog ───────────────────────────────────────
 function DeleteDialog({ entry, onConfirm, onCancel, loading }) {
   return (
     <div style={{
@@ -143,9 +138,7 @@ function DeleteDialog({ entry, onConfirm, onCancel, loading }) {
   );
 }
 
-// ── Main Dashboard ──────────────────────────────────────────────
 export default function DashboardPage() {
-  // Added "logout" mapping since it was missing from your useAuth destructuring
   const { username, password, masterPassword, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -157,18 +150,15 @@ export default function DashboardPage() {
   const [deleting, setDeleting]     = useState(null);
   const [delLoading, setDelLoading] = useState(false);
 
-  // Grouped credential object to stay DRY
   const credentials = { username, password, masterPassword };
 
   const loadPasswords = useCallback(async () => {
     setLoading(true);
-    setError(''); // Clear past errors on refresh
+    setError(''); // clear past errors on refresh
     try {
       const result = await fetchPasswords(credentials);
       
-      // SAFE UNPACKING:
-      // If the backend returns a wrapped envelope {"data": [...]}, extract it.
-      // If it's already a raw array, use it directly. Otherwise, fall back to [].
+
       if (result && Array.isArray(result)) {
         setPasswords(result);
       } else if (result && result.data && Array.isArray(result.data)) {
@@ -178,7 +168,7 @@ export default function DashboardPage() {
       }
     } catch (e) {
       setError(e.message || 'Failed to fetch vault items.');
-      setPasswords([]); // Gracefully fall back to an empty list so the UI doesn't crash
+      setPasswords([]); 
     } finally {
       setLoading(false);
     }
@@ -189,7 +179,6 @@ export default function DashboardPage() {
   const handleDelete = async () => {
     setDelLoading(true);
     try {
-      // Replaced old 'token' reference with our mandatory credential bundle
       await deletePassword(deleting.id, credentials);
       setDeleting(null);
       loadPasswords();
@@ -208,7 +197,7 @@ export default function DashboardPage() {
 
   return (
     <div className="page" style={{ alignItems: 'stretch', maxWidth: 720, margin: '0 auto' }}>
-      {/* Header */}
+      {/* header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32 }}>
         <div>
           <h1 style={{ fontFamily: 'var(--font-head)', fontWeight: 800, fontSize: 26 }}>
@@ -229,7 +218,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Search */}
+      {/* search */}
       <div style={{ marginBottom: 20 }}>
         <input
           className="input"
@@ -240,10 +229,9 @@ export default function DashboardPage() {
         />
       </div>
 
-      {/* Error */}
+      {/* err */}
       {error && <div className="msg-error" style={{ marginBottom: 16 }}>{error}</div>}
 
-      {/* Stats strip */}
       <div style={{
         display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 24,
       }}>
@@ -259,7 +247,7 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* List */}
+      {/*list*/}
       {loading ? (
         <div style={{ display: 'flex', justifyContent: 'center', padding: 60 }}>
           <span className="spinner" />
@@ -286,7 +274,6 @@ export default function DashboardPage() {
               onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--border-glow)'}
               onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
             >
-              {/* Avatar */}
               <div style={{
                 width: 40, height: 40, borderRadius: 10,
                 background: 'var(--gold-glow)', border: '1px solid var(--gold-dim)',
@@ -317,7 +304,6 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Modals */}
       {viewing && (
         <PasswordModal
           entry={viewing}

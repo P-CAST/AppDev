@@ -15,7 +15,7 @@ const RefreshIcon = () => (
   </svg>
 );
 
-// ── Password Strength Meter ──────────────────────────────────────
+// the password strength 
 function StrengthMeter({ password }) {
   const checks = [
     password.length >= 8,
@@ -48,7 +48,6 @@ function StrengthMeter({ password }) {
   );
 }
 
-// ── Random Password Generator ────────────────────────────────────
 function generatePassword(length = 16) {
   const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
   return Array.from(crypto.getRandomValues(new Uint32Array(length)))
@@ -56,9 +55,7 @@ function generatePassword(length = 16) {
     .join('');
 }
 
-// ── Main Component ───────────────────────────────────────────────
 export default function AddPasswordPage() {
-  // FIX: Destructure the database credentials instead of the old 'token'
   const { username, password, masterPassword } = useAuth();
   const navigate = useNavigate();
   
@@ -89,7 +86,6 @@ export default function AddPasswordPage() {
     setLoading(true);
     
     try {
-      // FIX: Bundle database credentials and pass them as the second argument
       const credentials = { username, password, masterPassword };
       await createPassword(form, credentials);
       

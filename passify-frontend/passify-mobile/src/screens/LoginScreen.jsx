@@ -13,9 +13,6 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { colors, theme } from '../components/theme';
 
-// =============================================================
-// STABLE FIELD COMPONENT (No layout-shifting structural styles)
-// =============================================================
 
 import Svg, { Rect, Path, Circle } from 'react-native-svg';
 
@@ -37,10 +34,7 @@ function Field({ label, value, onChangeText, placeholder, secure, hint }) {
   return (
     <View style={{ marginBottom: 14 }}>
       <Text style={theme.label}>{label}</Text>
-      {/* 
-        FIX: The wrapper maintains a constant size and elevation profile. 
-        Focusing only modifies the visible stroke color to prevent layout pass cycles.
-      */}
+     
       <View style={[styles.inputWrap, focused && styles.inputFocused]}>
         <TextInput
           style={[
@@ -63,7 +57,6 @@ function Field({ label, value, onChangeText, placeholder, secure, hint }) {
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           
-          // Clean Android Autofill Overrides
           autoComplete="off"
           importantForAutofill="no"
         />
@@ -211,7 +204,6 @@ const styles = StyleSheet.create({
   tabText: { color: colors.textMuted, fontWeight: '600', fontSize: 13 },
   tabTextActive: { color: '#000', fontWeight: '700', fontSize: 13 },
   inputWrap: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surface2, borderWidth: 1, borderColor: colors.border, borderRadius: 10, paddingHorizontal: 14, paddingVertical: Platform.OS === 'ios' ? 0 : 2 },
-  // FIX: Stripped out layout-altering shadow/elevation parameters to completely eradicate focus feedback cycles
   inputFocused: { borderColor: colors.gold },
   eyeBtn: { paddingLeft: 8, paddingVertical: 12 },
 });

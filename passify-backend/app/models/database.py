@@ -19,9 +19,6 @@ from flask import current_app
 logger = logging.getLogger(__name__)
 
 
-# ---------------------------------------------------------------------------
-# Connection factory
-# ---------------------------------------------------------------------------
 
 def get_connection(mysql_user: str, mysql_password: str) -> mysql.connector.MySQLConnection:
     """
@@ -44,9 +41,7 @@ def get_connection(mysql_user: str, mysql_password: str) -> mysql.connector.MySQ
         raise ConnectionError(f"Cannot connect to database: {exc}") from exc
 
 
-# ---------------------------------------------------------------------------
-# Schema bootstrap
-# ---------------------------------------------------------------------------
+
 
 def ensure_schema(conn: mysql.connector.MySQLConnection, login_user: str) -> None:
     """
@@ -77,9 +72,7 @@ def ensure_schema(conn: mysql.connector.MySQLConnection, login_user: str) -> Non
     logger.info("Schema ensured for user '%s'", login_user)
 
 
-# ---------------------------------------------------------------------------
-# CRUD helpers
-# ---------------------------------------------------------------------------
+
 
 def list_entries(
     conn: mysql.connector.MySQLConnection,
@@ -159,9 +152,6 @@ def delete_entry(
     return affected
 
 
-# ---------------------------------------------------------------------------
-# Private helpers
-# ---------------------------------------------------------------------------
 
 def _db_name(login_user: str) -> str:
     return f"db_password_{login_user}"

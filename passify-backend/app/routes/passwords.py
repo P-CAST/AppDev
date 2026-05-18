@@ -1,19 +1,3 @@
-"""
-routes/passwords.py
--------------------
-Blueprint: /api/passwords
-
-All routes require credentials in every request body (stateless).
-The master_password is used on-the-fly for encrypt/decrypt and is never
-persisted.
-
-Routes
-------
-GET    /api/passwords/          List all entries (id, name, tag)
-GET    /api/passwords/<id>      Decrypt and return a single entry
-POST   /api/passwords/          Create a new entry
-DELETE /api/passwords/<id>      Delete an entry
-"""
 
 from __future__ import annotations
 
@@ -34,27 +18,21 @@ passwords_bp = Blueprint("passwords", __name__)
 logger = logging.getLogger(__name__)
 
 
-# ---------------------------------------------------------------------------
-# Shared credential extractor
-# ---------------------------------------------------------------------------
 
 def _extract_credentials(body: dict) -> tuple[str, str, str]:
     """
     Pull mysql_user, mysql_password, master_password from a request body.
     Falls back to HTTP headers if not found in the body (for GET requests).
     """
-    # 1. Try pulling from the JSON body payload first (for POST/DELETE)
     mysql_user = body.get("mysql_user")
     mysql_password = body.get("mysql_password")
     master_password = body.get("master_password")
 
-    # 2. FIX: Fall back to incoming HTTP headers if the request is a GET (no body)
     if not mysql_user:
         mysql_user = request.headers.get("mysql-user")
         mysql_password = request.headers.get("mysql-password")
         master_password = request.headers.get("master-password")
 
-    # Clean up string bounds safely
     mysql_user = (mysql_user or "").strip()
     mysql_password = mysql_password or ""
     master_password = (master_password or "").strip()
@@ -77,10 +55,7 @@ def _open_conn(mysql_user: str, mysql_password: str):
     return conn
 
 
-# ---------------------------------------------------------------------------
 # GET /api/passwords/
-# ---------------------------------------------------------------------------
-
 @passwords_bp.route("/", methods=["GET"])
 def list_entries():
     """
@@ -115,10 +90,7 @@ def list_entries():
             conn.close()
 
 
-# ---------------------------------------------------------------------------
 # GET /api/passwords/<int:entry_id>
-# ---------------------------------------------------------------------------
-
 @passwords_bp.route("/<int:entry_id>", methods=["GET"])
 def get_entry(entry_id: int):
     """
@@ -163,10 +135,7 @@ def get_entry(entry_id: int):
             conn.close()
 
 
-# ---------------------------------------------------------------------------
 # POST /api/passwords/
-# ---------------------------------------------------------------------------
-
 @passwords_bp.route("/", methods=["POST"])
 def create_entry():
     """
@@ -215,10 +184,7 @@ def create_entry():
             conn.close()
 
 
-# ---------------------------------------------------------------------------
 # DELETE /api/passwords/<int:entry_id>
-# ---------------------------------------------------------------------------
-
 @passwords_bp.route("/<int:entry_id>", methods=["DELETE"])
 def delete_entry(entry_id: int):
     """
