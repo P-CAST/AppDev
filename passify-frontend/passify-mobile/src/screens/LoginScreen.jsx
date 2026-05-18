@@ -131,7 +131,7 @@ export default function LoginScreen() {
           </View>
           <Text style={[theme.heading, { fontSize: 30, textAlign: 'center' }]}>Passify</Text>
           <Text style={[theme.muted, { textAlign: 'center', marginTop: 6 }]}>
-            {isRegister ? 'Create your vault' : 'Connect to your vault'}
+            {isRegister ? 'Create your vault' : 'Connect to vault'}
           </Text>
         </View>
 
@@ -169,7 +169,7 @@ export default function LoginScreen() {
           onChangeText={set('masterPassword')} 
           placeholder="Vault encryption key" 
           secure 
-          hint="Never stored on server."
+          hint="This is never stored on server"
         />
 
         {isRegister && (
@@ -186,7 +186,7 @@ export default function LoginScreen() {
           {loading ? (
             <ActivityIndicator color="#000" />
           ) : (
-            <Text style={theme.btnPrimaryText}>{isRegister ? 'Register & Connect' : 'Connect Vault'}</Text>
+            <Text style={theme.btnPrimaryText}>{isRegister ? 'Register & Connect' : 'Connect to Vault'}</Text>
           )}
         </TouchableOpacity>
       </ScrollView>
